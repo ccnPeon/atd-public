@@ -9,6 +9,7 @@ docker build --build-arg UID=$(id -u arista) -t atddocker_cvpupdater:1.0 cvpUpda
 docker build --build-arg UID=$(id -u arista) -t atddocker_gitconfigletsync:1.0 gitConfigletSync/.
 docker build --build-arg UID=$(id -u arista) -t atddocker_ansiblegui:1.0 ansibleGui/.
 docker build --build-arg UID=$(id -u arista) -t atddocker_sslupdater:1.0 sslUpdater/.
+docker build --build-arg UID=$(id -u arista) -t atddocker_labdeploy:1.0 labDeploy/.
 docker build -t atddocker_labguides:1.0 labguides/.
 docker build -t atddocker_freerad:1.0 freeradius/.
 docker build -t atddocker_nginx:1.0 nginx/.
