@@ -30,4 +30,4 @@ EXPOSE 80
 
 USER arista
 
-ENTRYPOINT ["python3", "/usr/bin/backend.py"]
+ENTRYPOINT ["python3", "/usr/local/bin/backend.py"]
