@@ -22,6 +22,8 @@ COPY ConfigureTopology.py /usr/local/bin
 
 RUN chmod +x /usr/local/bin/ConfigureTopology.py
 
+WORKDIR /home/arista
+
 RUN chown -R arista:arista .
 
 EXPOSE 80
