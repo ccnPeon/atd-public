@@ -12,8 +12,6 @@ RUN apt install -y vim sudo screen
 
 RUN pip install ruamel.yaml rcvpapi cvprac pyaml tornado
 
-RUN mkdir /var/run/sshd
-
 RUN echo 'arista ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
 COPY backend.py /usr/local/bin
