@@ -178,6 +178,16 @@ services:
       - /home/arista/arista-dir/hosts:/etc/hosts:ro
     networks:
       - guac_net
+  labdeploy:
+    container_name: atd-labdeploy
+    image: atddocker_labdeploy:1.0
+    restart: always
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - /home/arista/arista-dir/hosts:/etc/hosts:ro
+    networks:
+      - atd_nginx
 
 networks:
   guac_net:
