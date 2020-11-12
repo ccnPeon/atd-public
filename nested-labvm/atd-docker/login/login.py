@@ -14,15 +14,25 @@ DEBUG = False
 __version__ = "2.1"
 
 # Open ACCESS_INFO.yaml and load the variables
-f = open('/etc/ACCESS_INFO.yaml')
+f = open('/etc/atd/ACCESS_INFO.yaml')
 access_info = YAML().load(f)
 f.close()
 
 # Set Main Script Variables
 topology = access_info['topology']
 login_info = access_info['login_info']
-nodes = access_info['nodes']
-veos_info = nodes['veos']
+
+
+# Open topo_build.yaml and load
+try:
+  f = open('/opt/atd/topologies/{0}/topo_build.yml'.format(topology))
+  topoinfo = YAML().load(f)
+  f.close()
+except:
+  sys.exit("topo_build not available")
+
+veos_info = topoinfo['nodes']
+additional_ssh_nodes = topoinfo['additional_ssh_nodes']
 
 # Set default menu mode
 menu_mode = 'MAIN'
