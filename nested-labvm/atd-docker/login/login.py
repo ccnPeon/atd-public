@@ -259,7 +259,7 @@ def main_menu():
 
 
     # Open yaml for the lab option (minus 'LAB_' from menu mode) and load the variables
-    menu_file = open('/opt/atd/topologies/files/menus/{0}'.format(default_menu_info['default_menu']))
+    menu_file = open('/opt/atd/topologies/{0}/files/menus/{1}'.format(topology,default_menu_info['default_menu']))
     menu_info = YAML().load(menu_file)
     menu_file.close()
 
