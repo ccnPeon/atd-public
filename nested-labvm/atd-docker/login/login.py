@@ -253,7 +253,7 @@ def main_menu():
     options_dict = {}
 
     # Open yaml for the default yaml and read what file to lookup for default menu
-    default_menu_file = open('/opt/atd/topologies/files/menus/default.yaml')
+    default_menu_file = open('/opt/atd/topologies/files/menus/{0}/default.yaml'.format(topology))
     default_menu_info = YAML().load(default_menu_file)
     default_menu_file.close()
 
