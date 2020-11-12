@@ -32,7 +32,13 @@ COPY login.py /usr/local/bin
 
 RUN chmod +x /usr/local/bin/login.py
 
-COPY ConfigureTopology.py /usr/local/bin
+RUN mkdir -p /usr/local/bin/ConfigureTopology
+
+RUN touch /usr/local/bin/ConfigureTopology/__init__.py
+
+COPY ConfigureTopology.py /usr/local/bin/ConfigureTopology
+
+RUN chmod +x /usr/local/bin/ConfigureTopology/ConfigureTopology.py && chmod +x /usr/local/bin/ConfigureTopology/__init__.py
 
 RUN chmod +x /usr/local/bin/ConfigureTopology.py
 
