@@ -137,7 +137,7 @@ def lab_options_menu():
 
     if menu_mode == 'LAB_OPTIONS':
       # Get Yaml Files in /home/arista/menus
-      menu_files = os.listdir('/opt/atd/topologies/files/menus')
+      menu_files = os.listdir('/opt/atd/topologies/{0}/files/menus'.format(topology))
       menu_files.sort()
       
     # Create Lab Options dict to save lab and later navigate to that menu of labs
@@ -194,7 +194,7 @@ def lab_options_menu():
       options_dict = {}
 
       # Open yaml for the lab option (minus 'LAB_' from menu mode) and load the variables
-      menu_file = open('/opt/atd/topologies/files/menus/' + menu_mode[4:])
+      menu_file = open('/opt/atd/topologies/{0}/files/menus/{1}'.format(topology,menu_mode[4:]))
       menu_info = YAML().load(menu_file)
       menu_file.close()
 
