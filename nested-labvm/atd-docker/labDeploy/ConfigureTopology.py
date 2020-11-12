@@ -35,57 +35,11 @@ zerotouch cancel
 # Create class to handle configuring the topology
 class ConfigureTopology():
 
-    def __init__(self,selected_menu,selected_lab,bypass_input=False,socket=None):
+    def __init__(self,selected_menu,selected_lab,bypass_input=False):
         self.selected_menu = selected_menu
-        if socket != None:
-            self.ws = socket
-            self.ws.name = 'Provided'
-            try:
-                self.send_to_socket('ConfigureTopology connected to backend socket.')
-            except:
-                self.send_to_syslog('Error connected to backend socket.')
-        else:
-            self.ws = self.create_websocket()
         self.selected_lab = selected_lab
         self.bypass_input = bypass_input
         self.deploy_lab()
-        if socket != None:
-            self.close_websocket()
-        
-    def create_websocket(self):
-        
-        try:
-            url = "ws://127.0.0.1:8888/backend"
-            self.send_to_syslog("INFO", "Connecting to web socket on {0}.".format(url))
-            ws = create_connection(url)
-            ws.send(json.dumps({
-                'type': 'openMessage',
-                'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                'status': 'ConfigureTopology Opened.'
-            }))
-            self.send_to_syslog("OK", "Connected to web socket for ConfigureTopology.")
-            ws.name = 'ConfigureTopology'
-            return ws
-        except:
-            self.send_to_syslog("ERROR", "ConfigureTopology cannot connect to web socket.")
-
-    def close_websocket(self):
-        self.ws.send(json.dumps({
-                'type': 'closeMessage',
-                'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                'status': 'ConfigureTopology Closing.'
-            }))
-        self.ws.close()
-
-    def send_to_socket(self,message):
-        if self.ws.name == 'Provided':
-            self.ws.send_to_socket(message)
-        else:
-            self.ws.send(json.dumps({
-                'type': 'serverData',
-                'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                'status': message
-            }))  
 
     def connect_to_cvp(self,access_info):
         # Adding new connection to CVP via rcvpapi
@@ -94,9 +48,10 @@ class ConfigureTopology():
             if c_login['user'] == 'arista':
                 while not cvp_clnt:
                     try:
-                        cvp_clnt = CVPCON(access_info['nodes']['cvp'][0]['internal_ip'],c_login['user'],c_login['pw'])
-                        self.send_to_socket('Connected to CVP')
+                        cvp_clnt = CVPCON(access_info['nodes']['cvp'][0]['ip'],c_login['user'],c_login['pw'])
                         self.send_to_syslog("OK","Connected to CVP at {0}".format(access_info['nodes']['cvp'][0]['internal_ip']))
+                        #DEBUG
+                        print('connected to cvp')
                         return cvp_clnt
                     except Exception as error:
                         print(error)
@@ -218,7 +173,7 @@ class ConfigureTopology():
             additional_commands = lab_info['lab_list'][self.selected_lab]['additional_commands']
 
         # Get access info for the topology
-        f = open('/etc/ACCESS_INFO.yaml')
+        f = open('/etc/atd/ACCESS_INFO.yaml')
         access_info = YAML().load(f)
         f.close()
 
@@ -227,7 +182,6 @@ class ConfigureTopology():
 
         # Send message that deployment is beginning
         print("Starting deployment for {0} - {1} lab...".format(self.selected_menu,self.selected_lab))
-        self.send_to_socket("Starting deployment for {0} - {1} lab...".format(self.selected_menu,self.selected_lab))
         # Check if the topo has CVP, and if it does, create CVP connection
         if 'cvp' in access_info['nodes']:
             self.client = self.connect_to_cvp(access_info)
@@ -237,15 +191,12 @@ class ConfigureTopology():
             
             # Execute all tasks generated from reset_devices()
             print('Gathering task information...')
-            self.send_to_socket('Gathering task information...')
             self.client.getAllTasks("pending")
             tasks_to_check = self.client.tasks['pending']
             self.client.execAllTasks("pending")
-            self.send_to_socket('Completed setting devices to topology: {}'.format(self.selected_lab))
             self.send_to_syslog("OK", 'Completed setting devices to topology: {}'.format(self.selected_lab))
 
             print('Waiting on change control to finish executing...')
-            self.send_to_socket('Waiting on change control to finish executing...')
             all_tasks_completed = False
             while not all_tasks_completed:
                 tasks_running = []
@@ -254,7 +205,6 @@ class ConfigureTopology():
                         tasks_running.append(task)
                     elif self.client.getTaskStatus(task['workOrderId'])['taskStatus'] == 'Failed':
                         print('Task {0} failed.'.format(task['workOrderId']))
-                        self.send_to_socket('Task {0} failed.'.format(task['workOrderId']))
                     else:
                         pass
                 
@@ -263,7 +213,6 @@ class ConfigureTopology():
                     # Execute additional commands in linux if needed
                     if len(additional_commands) > 0:
                         print('Running additional setup commands...')
-                        self.send_to_socket('Running additional setup commands...')
 
                         for command in additional_commands:
                             os.system(command)
@@ -271,7 +220,6 @@ class ConfigureTopology():
                     if not self.bypass_input_flag:
                         input('Lab Setup Completed. Please press Enter to continue...')
                     else:
-                        self.send_to_socket('Lab Setup Completed.')
                         self.send_to_syslog("OK", 'Lab Setup Completed.')
                     all_tasks_completed = True
                 else:
