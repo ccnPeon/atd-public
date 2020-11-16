@@ -40,8 +40,6 @@ COPY ConfigureTopology.py /usr/local/bin/ConfigureTopology
 
 RUN chmod +x /usr/local/bin/ConfigureTopology/ConfigureTopology.py && chmod +x /usr/local/bin/ConfigureTopology/__init__.py
 
-RUN echo 'login.py' >> .profile
-
 RUN chown -R arista:arista .
 
 EXPOSE 22
