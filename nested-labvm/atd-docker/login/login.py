@@ -168,21 +168,21 @@ def lab_options_menu():
 
       # Check to see if digit is in lab_options dict
       # try:
-        if user_input.lower() in lab_options_dict:
-            previous_menu = menu_mode
-            menu_mode = 'LAB_' + lab_options_dict[user_input]
-        elif user_input == '97' or user_input.lower() == 'back':
-            if menu_mode == previous_menu:
-                menu_mode = 'MAIN'
-            else:
-                menu_mode = previous_menu
-        elif user_input == '98' or user_input.lower() == 'ssh':
-            previous_menu = menu_mode
-            menu_mode = 'DEVICE_SSH'
-        elif user_input == '99' or user_input.lower() == 'main' or user_input == '99' or user_input.lower() == 'exit':
-            menu_mode = 'MAIN'
-        else:
-            print("Invalid Input")
+      if user_input.lower() in lab_options_dict:
+          previous_menu = menu_mode
+          menu_mode = 'LAB_' + lab_options_dict[user_input]
+      elif user_input == '97' or user_input.lower() == 'back':
+          if menu_mode == previous_menu:
+              menu_mode = 'MAIN'
+          else:
+              menu_mode = previous_menu
+      elif user_input == '98' or user_input.lower() == 'ssh':
+          previous_menu = menu_mode
+          menu_mode = 'DEVICE_SSH'
+      elif user_input == '99' or user_input.lower() == 'main' or user_input == '99' or user_input.lower() == 'exit':
+          menu_mode = 'MAIN'
+      else:
+          print("Invalid Input")
       # except:
         # print("Invalid Input")
 
