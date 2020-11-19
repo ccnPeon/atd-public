@@ -4,6 +4,7 @@ import sys
 import re
 from ruamel.yaml import YAML
 from ConfigureTopology.ConfigureTopology import ConfigureTopology
+from websocket import create_connection
 
 
 
@@ -70,6 +71,44 @@ def sort_veos(vd):
         fin_l.append(tmp_d[t_veos])
     return(fin_l)
 
+def get_public_ip():
+    """
+    Function to get Public IP.
+    """
+    response = requests.get('http://ipecho.net/plain')
+    return(response.text)
+
+def create_websocket():
+    
+    try:
+        url = "ws://127.0.0.1:8888/backend"
+        send_to_syslog("INFO", "Connecting to web socket on {0}.".format(url))
+        ws = create_connection(url)
+        ws.send(json.dumps({
+            'type': 'openMessage',
+            'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            'status': 'ConfigureTopology Opened.'
+        }))
+        send_to_syslog("OK", "Connected to web socket for ConfigureTopology.")
+        ws.name = 'ConfigureTopology'
+        return ws
+    except:
+        send_to_syslog("ERROR", "ConfigureTopology cannot connect to web socket.")
+
+def close_websocket(ws):
+    ws.send(json.dumps({
+            'type': 'closeMessage',
+            'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            'status': 'ConfigureTopology Closing.'
+        }))
+    ws.close()
+
+def send_to_socket(ws,selected_lab,selected_menu):
+    message = {}
+    message['type'] = 'clientData'
+    message['selectedMenu'] = selected_menu;
+    message['selectedLab'] = selected_lab;
+    ws.send(json.dumps(message))
 
 def device_menu():
     global menu_mode
@@ -247,7 +286,9 @@ def lab_options_menu():
       # try:
       if user_input.lower() in options_dict:
           previous_menu = menu_mode
-          ConfigureTopology(selected_menu=options_dict[user_input]['selected_menu'],selected_lab=options_dict[user_input]['selected_lab'])
+          ws = create_websocket(get_public_ip())
+          send_to_socket(selected_menu=options_dict[user_input]['selected_menu'],selected_lab=options_dict[user_input]['selected_lab'])
+          ws.close()
       elif user_input == '97' or user_input.lower() == 'back':
           if menu_mode == previous_menu:
               menu_mode = 'MAIN'
@@ -311,17 +352,19 @@ def main_menu():
     # Check user input to see which menu to change to
     # try:
     if user_input.lower() in options_dict:
-        ConfigureTopology(selected_menu=options_dict[user_input]['selected_menu'],selected_lab=options_dict[user_input]['selected_lab'])
+        ws = create_websocket(get_public_ip())
+        send_to_socket(selected_menu=options_dict[user_input]['selected_menu'],selected_lab=options_dict[user_input]['selected_lab'])
+        ws.close()
     elif user_input == '98' or user_input.lower() == 'ssh':
-      previous_menu = menu_mode
-      menu_mode = 'DEVICE_SSH'
+        previous_menu = menu_mode
+        menu_mode = 'DEVICE_SSH'
     elif user_input == '97' or user_input.lower() == 'labs':
-      previous_menu = menu_mode
-      menu_mode = 'LAB_OPTIONS'
+        previous_menu = menu_mode
+        menu_mode = 'LAB_OPTIONS'
     elif user_input == '99' or user_input.lower() == 'exit' or user_input.lower() == 'quit':
-      menu_mode = 'EXIT'
+        menu_mode = 'EXIT'
     else:
-      print("Invalid Input")
+        print("Invalid Input")
     # except:
     #     print("Invalid Input")
 
