@@ -77,12 +77,14 @@ def send_to_socket(selected_menu,selected_lab):
             'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             'status': 'Login.py Opened.'
         }))
+        time.sleep(1)
         ws.send(json.dumps({
           'type': 'clientData',
           'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
           'selectedMenu': selected_menu,
           'selectedLab': selected_lab
         }))
+        time.sleep(2)
         ws.send(json.dumps({
             'type': 'closeMessage',
             'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
