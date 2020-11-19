@@ -67,9 +67,9 @@ def get_public_ip():
     response = requests.get('http://ipecho.net/plain')
     return(response.text)
 
-def send_to_socket(public_ip,selected_menu,selected_lab):
+def send_to_socket(selected_menu,selected_lab):
     try:
-        url = "ws://{0}/backend".format(public_ip)
+        url = "ws://{0}/backend".format(get_public_ip())
         send_to_syslog("INFO", "Connecting to web socket on {0}.".format(url))
         ws = create_connection(url)
         ws.send(json.dumps({
@@ -297,7 +297,7 @@ def lab_options_menu():
       # try:
       if user_input.lower() in options_dict:
           previous_menu = menu_mode
-          send_to_socket(ws,selected_menu=options_dict[user_input]['selected_menu'],selected_lab=options_dict[user_input]['selected_lab'])
+          send_to_socket(selected_menu=options_dict[user_input]['selected_menu'],selected_lab=options_dict[user_input]['selected_lab'])
       elif user_input == '97' or user_input.lower() == 'back':
           if menu_mode == previous_menu:
               menu_mode = 'MAIN'
@@ -361,9 +361,7 @@ def main_menu():
     # Check user input to see which menu to change to
     # try:
     if user_input.lower() in options_dict:
-        ws = create_websocket(get_public_ip())
-        send_to_socket(ws,selected_menu=options_dict[user_input]['selected_menu'],selected_lab=options_dict[user_input]['selected_lab'])
-        ws.close()
+        send_to_socket(selected_menu=options_dict[user_input]['selected_menu'],selected_lab=options_dict[user_input]['selected_lab'])
     elif user_input == '98' or user_input.lower() == 'ssh':
         previous_menu = menu_mode
         menu_mode = 'DEVICE_SSH'
