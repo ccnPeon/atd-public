@@ -105,24 +105,24 @@ def device_menu():
 
     # Check to see if input is in device_dict
     counter = 1
-    try:
-      if user_input.lower() in device_dict:
-          os.system('ssh ' + device_dict[user_input])
-      elif user_input == '96' or user_input.lower() == 'screen':
-          os.system('/usr/bin/screen')
-      elif user_input == '97' or user_input.lower() == 'back':
-          if menu_mode == previous_menu:
-              menu_mode = 'MAIN'
-          else:
-              menu_mode = previous_menu
-      elif user_input == '98' or user_input.lower() == 'bash' or user_input.lower() == 'shell':
-          os.system('/bin/bash')
-      elif user_input == '99' or user_input.lower() == 'main' or user_input == '99' or user_input.lower() == 'exit':
-          menu_mode = 'MAIN'
-      else:
-          print("Invalid Input")
-    except:
-      print("Invalid Input")
+    # try:
+    if user_input.lower() in device_dict:
+        os.system('ssh ' + device_dict[user_input])
+    elif user_input == '96' or user_input.lower() == 'screen':
+        os.system('/usr/bin/screen')
+    elif user_input == '97' or user_input.lower() == 'back':
+        if menu_mode == previous_menu:
+            menu_mode = 'MAIN'
+        else:
+            menu_mode = previous_menu
+    elif user_input == '98' or user_input.lower() == 'bash' or user_input.lower() == 'shell':
+        os.system('/bin/bash')
+    elif user_input == '99' or user_input.lower() == 'main' or user_input == '99' or user_input.lower() == 'exit':
+        menu_mode = 'MAIN'
+    else:
+        print("Invalid Input")
+    # except:
+    #   print("Invalid Input")
 
 
 
@@ -167,24 +167,24 @@ def lab_options_menu():
       user_input = input("\nWhat would you like to do?: ").replace(' ', '')
 
       # Check to see if digit is in lab_options dict
-      try:
-          if user_input.lower() in lab_options_dict:
-              previous_menu = menu_mode
-              menu_mode = 'LAB_' + lab_options_dict[user_input]
-          elif user_input == '97' or user_input.lower() == 'back':
-              if menu_mode == previous_menu:
-                  menu_mode = 'MAIN'
-              else:
-                  menu_mode = previous_menu
-          elif user_input == '98' or user_input.lower() == 'ssh':
-              previous_menu = menu_mode
-              menu_mode = 'DEVICE_SSH'
-          elif user_input == '99' or user_input.lower() == 'main' or user_input == '99' or user_input.lower() == 'exit':
+      # try:
+      if user_input.lower() in lab_options_dict:
+          previous_menu = menu_mode
+          menu_mode = 'LAB_' + lab_options_dict[user_input]
+      elif user_input == '97' or user_input.lower() == 'back':
+          if menu_mode == previous_menu:
               menu_mode = 'MAIN'
           else:
-              print("Invalid Input")
-      except:
+              menu_mode = previous_menu
+      elif user_input == '98' or user_input.lower() == 'ssh':
+          previous_menu = menu_mode
+          menu_mode = 'DEVICE_SSH'
+      elif user_input == '99' or user_input.lower() == 'main' or user_input == '99' or user_input.lower() == 'exit':
+          menu_mode = 'MAIN'
+      else:
           print("Invalid Input")
+      # except:
+      #     print("Invalid Input")
 
 
 
@@ -219,24 +219,24 @@ def lab_options_menu():
       user_input = input("What would you like to do?: ").replace(' ', '')
 
       # Check to see if input is in commands_dict
-      try:
-          if user_input.lower() in options_dict:
-              previous_menu = menu_mode
-              ConfigureTopology(selected_menu=options_dict[user_input]['selected_menu'],selected_lab=options_dict[user_input]['selected_lab'])
-          elif user_input == '97' or user_input.lower() == 'back':
-              if menu_mode == previous_menu:
-                  menu_mode = 'MAIN'
-              else:
-                  menu_mode = previous_menu
-          elif user_input == '98' or user_input.lower() == 'ssh':
-              previous_menu = menu_mode
-              menu_mode = 'DEVICE_SSH'
-          elif user_input == '99' or user_input.lower() == 'main' or user_input == '99' or user_input.lower() == 'exit':
+      # try:
+      if user_input.lower() in options_dict:
+          previous_menu = menu_mode
+          ConfigureTopology(selected_menu=options_dict[user_input]['selected_menu'],selected_lab=options_dict[user_input]['selected_lab'])
+      elif user_input == '97' or user_input.lower() == 'back':
+          if menu_mode == previous_menu:
               menu_mode = 'MAIN'
           else:
-              print("Invalid Input")
-      except:
+              menu_mode = previous_menu
+      elif user_input == '98' or user_input.lower() == 'ssh':
+          previous_menu = menu_mode
+          menu_mode = 'DEVICE_SSH'
+      elif user_input == '99' or user_input.lower() == 'main' or user_input == '99' or user_input.lower() == 'exit':
+          menu_mode = 'MAIN'
+      else:
           print("Invalid Input")
+      # except:
+      #     print("Invalid Input")
 
 def main_menu():
     global menu_mode
@@ -284,21 +284,21 @@ def main_menu():
     user_input = input("What would you like to do?: ").replace(' ', '')
     
     # Check user input to see which menu to change to
-    try:
-        if user_input.lower() in options_dict:
-            ConfigureTopology(selected_menu=options_dict[user_input]['selected_menu'],selected_lab=options_dict[user_input]['selected_lab'])
-        elif user_input == '98' or user_input.lower() == 'ssh':
-          previous_menu = menu_mode
-          menu_mode = 'DEVICE_SSH'
-        elif user_input == '97' or user_input.lower() == 'labs':
-          previous_menu = menu_mode
-          menu_mode = 'LAB_OPTIONS'
-        elif user_input == '99' or user_input.lower() == 'exit' or user_input.lower() == 'quit':
-          menu_mode = 'EXIT'
-        else:
-          print("Invalid Input")
-    except:
-        print("Invalid Input")
+    # try:
+    if user_input.lower() in options_dict:
+        ConfigureTopology(selected_menu=options_dict[user_input]['selected_menu'],selected_lab=options_dict[user_input]['selected_lab'])
+    elif user_input == '98' or user_input.lower() == 'ssh':
+      previous_menu = menu_mode
+      menu_mode = 'DEVICE_SSH'
+    elif user_input == '97' or user_input.lower() == 'labs':
+      previous_menu = menu_mode
+      menu_mode = 'LAB_OPTIONS'
+    elif user_input == '99' or user_input.lower() == 'exit' or user_input.lower() == 'quit':
+      menu_mode = 'EXIT'
+    else:
+      print("Invalid Input")
+    # except:
+    #     print("Invalid Input")
 
 
 
