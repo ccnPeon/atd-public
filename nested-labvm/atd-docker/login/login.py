@@ -302,7 +302,7 @@ def lab_options_menu():
       if user_input.lower() in options_dict:
           previous_menu = menu_mode
           ws = create_websocket(get_public_ip())
-          send_to_socket(selected_menu=options_dict[user_input]['selected_menu'],selected_lab=options_dict[user_input]['selected_lab'])
+          send_to_socket(ws,selected_menu=options_dict[user_input]['selected_menu'],selected_lab=options_dict[user_input]['selected_lab'])
           ws.close()
       elif user_input == '97' or user_input.lower() == 'back':
           if menu_mode == previous_menu:
@@ -368,7 +368,7 @@ def main_menu():
     # try:
     if user_input.lower() in options_dict:
         ws = create_websocket(get_public_ip())
-        send_to_socket(selected_menu=options_dict[user_input]['selected_menu'],selected_lab=options_dict[user_input]['selected_lab'])
+        send_to_socket(ws,selected_menu=options_dict[user_input]['selected_menu'],selected_lab=options_dict[user_input]['selected_lab'])
         ws.close()
     elif user_input == '98' or user_input.lower() == 'ssh':
         previous_menu = menu_mode
