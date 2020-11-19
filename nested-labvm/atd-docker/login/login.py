@@ -50,21 +50,25 @@ def natural_keys(text):
   return [ text_to_int(char) for char in re.split(r'(\d+)', text) ]
 
 def sort_veos(vd):
-  tmp_l = []
-  tmp_d = {}
-  fin_l = []
-  for t_veos in vd:
-    tmp_l.append(t_veos)
-    tmp_d[t_veos] = t_veos
-  tmp_l.sort(key=natural_keys)
-  # If cvx in list, move to end
-  if 'cvx' in tmp_l[0]:
+    if vd == None:
+        return
+    tmp_l = []
+    tmp_d = {}
+    fin_l = []
+    for t_veos in vd:
+        t_veos_name = list(t_veos.keys())[0]
+        tmp_l.append(t_veos_name)
+        tmp_d[t_veos_name] = dict(t_veos[t_veos_name])
+        tmp_d[t_veos_name]['hostname'] = t_veos_name
+    tmp_l.sort(key=natural_keys)
+    # If cvx in list, move to end
+    if 'cvx' in tmp_l[0]:
         tmp_cvx = tmp_l[0]
         tmp_l.pop(0)
         tmp_l.append(tmp_cvx)
-  for t_veos in tmp_l:
-    fin_l.append(tmp_d[t_veos])
-  return(fin_l)
+    for t_veos in tmp_l:
+        fin_l.append(tmp_d[t_veos])
+    return(fin_l)
 
 
 def device_menu():
