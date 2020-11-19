@@ -99,6 +99,7 @@ def send_to_socket(ws,selected_lab,selected_menu):
       'selectedMenu': selected_menu,
       'selectedLab': selected_lab
     }))
+    return
 
 def text_to_int(text):
   return int(text) if text.isdigit() else text
