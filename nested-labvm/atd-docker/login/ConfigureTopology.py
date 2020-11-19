@@ -36,7 +36,7 @@ class ConfigureTopology():
         self.selected_menu = selected_menu
         self.selected_lab = selected_lab
         self.public_module_flag = public_module_flag
-        self.ws = self.create_websocket()
+        self.ws = self.create_websocket(self.get_public_ip())
         self.deploy_lab()
 
     def connect_to_cvp(self,access_info):
@@ -216,8 +216,6 @@ class ConfigureTopology():
 
 
     def deploy_lab(self):
-
-        self.create_websocket(self.get_public_ip())
 
         # Check for additional commands in lab yaml file
         lab_file = open('/home/arista/menus/{0}'.format(self.selected_menu + '.yaml'))
