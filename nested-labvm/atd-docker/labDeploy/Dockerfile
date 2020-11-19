@@ -18,7 +18,9 @@ COPY backend.py /usr/local/bin
 
 RUN chmod +x /usr/local/bin/backend.py
 
-COPY ConfigureTopology.py /usr/local/bin
+COPY BackendFunctions /usr/local/bin/
+
+COPY ConfigureTopology.py /usr/local/bin/ConfigureTopology
 
 # RUN chmod +x /usr/local/bin/ConfigureTopology.py
 
