@@ -72,12 +72,6 @@ def send_to_socket(selected_menu,selected_lab):
         url = "ws://{0}/backend".format(get_public_ip())
         send_to_syslog("INFO", "Connecting to web socket on {0}.".format(url))
         ws = create_connection(url)
-        # ws.send(json.dumps({
-        #     'type': 'openMessage',
-        #     'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        #     'status': 'Login.py Opened.'
-        # }))
-        # time.sleep(1)
         ws.send(json.dumps({
           'type': 'clientData',
           'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -85,11 +79,6 @@ def send_to_socket(selected_menu,selected_lab):
           'selectedLab': selected_lab
         }))
         time.sleep(2)
-        # ws.send(json.dumps({
-        #     'type': 'closeMessage',
-        #     'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        #     'status': 'Login.py Closing.'
-        # }))
         send_to_syslog("OK", "Connected to web socket for ConfigureTopology.")
         ws.close()
     except Exception as error:

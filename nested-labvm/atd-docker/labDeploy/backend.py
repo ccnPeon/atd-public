@@ -44,8 +44,12 @@ class BackEnd(tornado.websocket.WebSocketHandler):
         elif data['type'] == 'serverData':
             pass
         elif data['type'] == 'clientData':
-            deploy_lab(selected_menu=data['selectedMenu'],selected_lab=data['selectedLab'],bypass_input=True)
-
+            try:
+                deploy_lab(selected_menu=data['selectedMenu'],selected_lab=data['selectedLab'],bypass_input=True)
+            except Exception as error:
+                with open('/var/log/error.log', 'a') as error_file:
+                    error_file.write(error+'/n')
+                    error_file.close()
 
     def send_to_syslog(self,mstat,mtype):
         """
