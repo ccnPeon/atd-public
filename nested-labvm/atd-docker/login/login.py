@@ -4,6 +4,9 @@ import sys
 import re
 from ruamel.yaml import YAML
 import requests
+from datetime import timedelta, datetime, timezone, date
+import syslog
+import time
 from websocket import create_connection
 
 
@@ -44,7 +47,7 @@ previous_menu = ''
 #################### Functions ####################
 ###################################################
 
-def send_to_syslog(self,mstat,mtype):
+def send_to_syslog(mstat,mtype):
     """
     Function to send output from service file to Syslog
     Parameters:
@@ -121,7 +124,7 @@ def sort_veos(vd):
     for t_veos in tmp_l:
         fin_l.append(tmp_d[t_veos])
     return(fin_l)
-    
+
 def device_menu():
     global menu_mode
     global previous_menu
