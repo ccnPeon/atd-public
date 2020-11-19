@@ -85,10 +85,10 @@ class ConfigureTopology():
         response = requests.get('http://ipecho.net/plain')
         return(response.text)
 
-    def create_websocket(self):
+    def create_websocket(self,public_ip):
         
         try:
-            url = "ws://127.0.0.1:8888/backend"
+            url = "ws://{0}:8888/backend".format(public_ip)
             self.send_to_syslog("INFO", "Connecting to web socket on {0}.".format(url))
             ws = create_connection(url)
             ws.send(json.dumps({
