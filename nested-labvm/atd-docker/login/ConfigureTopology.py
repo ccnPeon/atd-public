@@ -93,7 +93,7 @@ class ConfigureTopology():
             url = "ws://{0}/backend".format(public_ip)
             print(public_ip)
             self.send_to_syslog("INFO", "Connecting to web socket on {0}.".format(url))
-            ws.create_connection(url)
+            ws = create_connection(url)
             ws.send(json.dumps({
                 'type': 'openMessage',
                 'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
