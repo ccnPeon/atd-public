@@ -102,7 +102,8 @@ class ConfigureTopology():
             self.send_to_syslog("OK", "Connected to web socket for ConfigureTopology.")
             print('websocket connected.')
             return ws
-        except:
+        except Exception as error:
+            print(error)
             print('websocket failed.')
             self.send_to_syslog("ERROR", "ConfigureTopology cannot connect to web socket.")
 
