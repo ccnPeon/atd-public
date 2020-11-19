@@ -8,7 +8,7 @@ from scp import SCPClient
 import os
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-import websocket
+from websocket import create_connection
 
 
 DEBUG = False
@@ -91,9 +91,9 @@ class ConfigureTopology():
         
         try:
             url = "ws://{0}/backend".format(public_ip)
+            print(public_ip)
             self.send_to_syslog("INFO", "Connecting to web socket on {0}.".format(url))
-            ws = websocket.WebSocket()
-            ws.connect(url)
+            ws.create_connection(url)
             ws.send(json.dumps({
                 'type': 'openMessage',
                 'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
