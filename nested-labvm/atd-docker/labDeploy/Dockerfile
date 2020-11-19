@@ -10,7 +10,7 @@ RUN apt update
 
 RUN apt install -y vim sudo screen
 
-RUN pip install ruamel.yaml rcvpapi cvprac pyaml tornado
+RUN pip install ruamel.yaml rcvpapi cvprac pyaml paramiko scp tornado
 
 RUN echo 'arista ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
