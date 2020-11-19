@@ -44,32 +44,17 @@ previous_menu = ''
 #################### Functions ####################
 ###################################################
 
-def text_to_int(text):
-  return int(text) if text.isdigit() else text
-
-def natural_keys(text):
-  return [ text_to_int(char) for char in re.split(r'(\d+)', text) ]
-
-def sort_veos(vd):
-    if vd == None:
-        return
-    tmp_l = []
-    tmp_d = {}
-    fin_l = []
-    for t_veos in vd:
-        t_veos_name = list(t_veos.keys())[0]
-        tmp_l.append(t_veos_name)
-        tmp_d[t_veos_name] = dict(t_veos[t_veos_name])
-        tmp_d[t_veos_name]['hostname'] = t_veos_name
-    tmp_l.sort(key=natural_keys)
-    # If cvx in list, move to end
-    if 'cvx' in tmp_l[0]:
-        tmp_cvx = tmp_l[0]
-        tmp_l.pop(0)
-        tmp_l.append(tmp_cvx)
-    for t_veos in tmp_l:
-        fin_l.append(tmp_d[t_veos])
-    return(fin_l)
+def send_to_syslog(self,mstat,mtype):
+    """
+    Function to send output from service file to Syslog
+    Parameters:
+    mstat = Message Status, ie "OK", "INFO" (required)
+    mtype = Message to be sent/displayed (required)
+    """
+    mmes = "\t" + mtype
+    syslog.syslog("[{0}] {1}".format(mstat,mmes.expandtabs(7 - len(mstat))))
+    if DEBUG:
+        print("[{0}] {1}".format(mstat,mmes.expandtabs(7 - len(mstat))))
 
 def get_public_ip():
     """
@@ -110,6 +95,33 @@ def send_to_socket(ws,selected_lab,selected_menu):
     message['selectedLab'] = selected_lab;
     ws.send(json.dumps(message))
 
+def text_to_int(text):
+  return int(text) if text.isdigit() else text
+
+def natural_keys(text):
+  return [ text_to_int(char) for char in re.split(r'(\d+)', text) ]
+
+def sort_veos(vd):
+    if vd == None:
+        return
+    tmp_l = []
+    tmp_d = {}
+    fin_l = []
+    for t_veos in vd:
+        t_veos_name = list(t_veos.keys())[0]
+        tmp_l.append(t_veos_name)
+        tmp_d[t_veos_name] = dict(t_veos[t_veos_name])
+        tmp_d[t_veos_name]['hostname'] = t_veos_name
+    tmp_l.sort(key=natural_keys)
+    # If cvx in list, move to end
+    if 'cvx' in tmp_l[0]:
+        tmp_cvx = tmp_l[0]
+        tmp_l.pop(0)
+        tmp_l.append(tmp_cvx)
+    for t_veos in tmp_l:
+        fin_l.append(tmp_d[t_veos])
+    return(fin_l)
+    
 def device_menu():
     global menu_mode
     global previous_menu
