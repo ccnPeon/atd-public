@@ -88,7 +88,7 @@ class ConfigureTopology():
     def create_websocket(self,public_ip):
         
         try:
-            url = "ws://{0}:8888/backend".format(public_ip)
+            url = "ws://{0}:80/backend".format(public_ip)
             self.send_to_syslog("INFO", "Connecting to web socket on {0}.".format(url))
             ws = create_connection(url)
             ws.send(json.dumps({
@@ -97,9 +97,10 @@ class ConfigureTopology():
                 'status': 'ConfigureTopology Opened.'
             }))
             self.send_to_syslog("OK", "Connected to web socket for ConfigureTopology.")
-            ws.name = 'ConfigureTopology'
+            print('websocket connected.')
             return ws
         except:
+            print('websocket failed.')
             self.send_to_syslog("ERROR", "ConfigureTopology cannot connect to web socket.")
 
     def close_websocket(self):
