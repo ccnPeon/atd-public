@@ -7,6 +7,7 @@ import requests
 from datetime import timedelta, datetime, timezone, date
 import syslog
 import time
+import json
 from websocket import create_connection
 
 
@@ -79,7 +80,8 @@ def create_websocket(public_ip):
         }))
         send_to_syslog("OK", "Connected to web socket for ConfigureTopology.")
         return ws
-    except:
+    except Exception as error:
+        print(error)
         send_to_syslog("ERROR", "ConfigureTopology cannot connect to web socket.")
 
 def close_websocket(ws):
@@ -93,8 +95,8 @@ def close_websocket(ws):
 def send_to_socket(ws,selected_lab,selected_menu):
     message = {}
     message['type'] = 'clientData'
-    message['selectedMenu'] = selected_menu;
-    message['selectedLab'] = selected_lab;
+    message['selectedMenu'] = selected_menu
+    message['selectedLab'] = selected_lab
     ws.send(json.dumps(message))
 
 def text_to_int(text):
