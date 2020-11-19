@@ -32,6 +32,7 @@ except:
   sys.exit("topo_build not available")
 
 veos_info = topoinfo['nodes']
+print(veos_info)
 additional_ssh_nodes = topoinfo['additional_ssh_nodes']
 
 # Set default menu mode
@@ -52,7 +53,7 @@ def sort_veos(vd):
   tmp_l = []
   tmp_d = {}
   fin_l = []
-  for t_veos,values in vd.items():
+  for t_veos in vd:
     tmp_l.append(t_veos)
     tmp_d[t_veos] = t_veos
   tmp_l.sort(key=natural_keys)
