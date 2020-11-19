@@ -78,7 +78,7 @@ class ConfigureTopology():
         else:
             pass
 
-    def get_public_ip():
+    def get_public_ip(self):
         """
         Function to get Public IP.
         """
