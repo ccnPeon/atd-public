@@ -3,7 +3,7 @@ import os
 import sys
 import re
 from ruamel.yaml import YAML
-from ConfigureTopology.ConfigureTopology import ConfigureTopology
+import requests
 from websocket import create_connection
 
 
