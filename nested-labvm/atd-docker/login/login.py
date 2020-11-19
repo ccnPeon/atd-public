@@ -67,8 +67,7 @@ def get_public_ip():
     response = requests.get('http://ipecho.net/plain')
     return(response.text)
 
-def create_websocket(public_ip):
-    
+def send_to_socket(public_ip,selected_menu,selected_lab):
     try:
         url = "ws://{0}/backend".format(public_ip)
         send_to_syslog("INFO", "Connecting to web socket on {0}.".format(url))
@@ -76,30 +75,24 @@ def create_websocket(public_ip):
         ws.send(json.dumps({
             'type': 'openMessage',
             'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            'status': 'ConfigureTopology Opened.'
+            'status': 'Login.py Opened.'
+        }))
+        ws.send(json.dumps({
+          'type': 'clientData',
+          'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+          'selectedMenu': selected_menu,
+          'selectedLab': selected_lab
+        }))
+        ws.send(json.dumps({
+            'type': 'closeMessage',
+            'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            'status': 'Login.py Closing.'
         }))
         send_to_syslog("OK", "Connected to web socket for ConfigureTopology.")
-        return ws
+        ws.close()
     except Exception as error:
         print(error)
         send_to_syslog("ERROR", "ConfigureTopology cannot connect to web socket.")
-
-def close_websocket(ws):
-    ws.send(json.dumps({
-            'type': 'closeMessage',
-            'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            'status': 'ConfigureTopology Closing.'
-        }))
-    ws.close()
-
-def send_to_socket(ws,selected_lab,selected_menu):
-    ws.send(json.dumps({
-      'type': 'clientData',
-      'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-      'selectedMenu': selected_menu,
-      'selectedLab': selected_lab
-    }))
-    return
 
 def text_to_int(text):
   return int(text) if text.isdigit() else text
@@ -304,9 +297,7 @@ def lab_options_menu():
       # try:
       if user_input.lower() in options_dict:
           previous_menu = menu_mode
-          ws = create_websocket(get_public_ip())
           send_to_socket(ws,selected_menu=options_dict[user_input]['selected_menu'],selected_lab=options_dict[user_input]['selected_lab'])
-          ws.close()
       elif user_input == '97' or user_input.lower() == 'back':
           if menu_mode == previous_menu:
               menu_mode = 'MAIN'
