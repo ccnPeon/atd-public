@@ -20,8 +20,6 @@ RUN chmod +x /usr/local/bin/backend.py
 
 COPY BackendFunctions /usr/local/bin/
 
-COPY ConfigureTopology.py /usr/local/bin/ConfigureTopology
-
 # RUN chmod +x /usr/local/bin/ConfigureTopology.py
 
 # WORKDIR /home/arista
