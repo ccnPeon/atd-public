@@ -69,16 +69,15 @@ def get_public_ip():
 def create_websocket(public_ip):
     
     try:
-        url = "ws://public_ip/backend"
-        send_to_syslog("INFO", "Connecting to web socket on {0}.".format(public_ip))
-        ws = create_connection(public_ip)
+        url = "ws://{0}/backend".format(public_ip)
+        send_to_syslog("INFO", "Connecting to web socket on {0}.".format(url))
+        ws = create_connection(url)
         ws.send(json.dumps({
             'type': 'openMessage',
             'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             'status': 'ConfigureTopology Opened.'
         }))
         send_to_syslog("OK", "Connected to web socket for ConfigureTopology.")
-        ws.name = 'ConfigureTopology'
         return ws
     except:
         send_to_syslog("ERROR", "ConfigureTopology cannot connect to web socket.")
