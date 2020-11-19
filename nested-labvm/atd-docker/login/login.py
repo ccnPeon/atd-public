@@ -93,11 +93,12 @@ def close_websocket(ws):
     ws.close()
 
 def send_to_socket(ws,selected_lab,selected_menu):
-    message = {}
-    message['type'] = 'clientData'
-    message['selectedMenu'] = selected_menu
-    message['selectedLab'] = selected_lab
-    ws.send(json.dumps(message))
+    ws.send(json.dumps({
+      'type': 'clientData',
+      'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+      'selectedMenu': selected_menu,
+      'selectedLab': selected_lab
+    }))
 
 def text_to_int(text):
   return int(text) if text.isdigit() else text
