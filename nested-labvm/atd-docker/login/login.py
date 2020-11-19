@@ -78,12 +78,12 @@ def get_public_ip():
     response = requests.get('http://ipecho.net/plain')
     return(response.text)
 
-def create_websocket():
+def create_websocket(public_ip):
     
     try:
-        url = "ws://127.0.0.1:8888/backend"
-        send_to_syslog("INFO", "Connecting to web socket on {0}.".format(url))
-        ws = create_connection(url)
+        url = "ws://public_ip/backend"
+        send_to_syslog("INFO", "Connecting to web socket on {0}.".format(public_ip))
+        ws = create_connection(public_ip)
         ws.send(json.dumps({
             'type': 'openMessage',
             'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
