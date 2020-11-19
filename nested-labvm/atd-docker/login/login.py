@@ -52,7 +52,7 @@ def sort_veos(vd):
   tmp_l = []
   tmp_d = {}
   fin_l = []
-  for t_veos in vd:
+  for t_veos,values in vd.items():
     tmp_l.append(t_veos)
     tmp_d[t_veos] = t_veos
   tmp_l.sort(key=natural_keys)
