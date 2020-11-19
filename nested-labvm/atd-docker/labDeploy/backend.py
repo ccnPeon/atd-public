@@ -20,6 +20,7 @@ class BackEnd(tornado.websocket.WebSocketHandler):
     def open(self):
         self.connections.add(self)
         self.send_to_syslog('OK', 'Connection opened from {0}'.format(self.request.remote_ip))
+        print(connections)
         self.schedule_update()
 
     def close(self):

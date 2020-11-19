@@ -78,6 +78,45 @@ class ConfigureTopology():
         else:
             pass
 
+    def get_public_ip():
+        """
+        Function to get Public IP.
+        """
+        response = requests.get('http://ipecho.net/plain')
+        return(response.text)
+
+    def create_websocket(self):
+        
+        try:
+            url = "ws://127.0.0.1:8888/backend"
+            self.send_to_syslog("INFO", "Connecting to web socket on {0}.".format(url))
+            ws = create_connection(url)
+            ws.send(json.dumps({
+                'type': 'openMessage',
+                'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                'status': 'ConfigureTopology Opened.'
+            }))
+            self.send_to_syslog("OK", "Connected to web socket for ConfigureTopology.")
+            ws.name = 'ConfigureTopology'
+            return ws
+        except:
+            self.send_to_syslog("ERROR", "ConfigureTopology cannot connect to web socket.")
+
+    def close_websocket(self):
+        self.ws.send(json.dumps({
+                'type': 'closeMessage',
+                'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                'status': 'ConfigureTopology Closing.'
+            }))
+        self.ws.close()
+
+    def send_to_socket(self,message):
+            self.ws.send(json.dumps({
+                'type': 'serverData',
+                'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                'status': message
+            }))  
+
     def get_device_info(self):
         eos_devices = []
         for dev in self.client.inventory:
@@ -86,7 +125,6 @@ class ConfigureTopology():
             tmp_eos_sw.updateDevice(self.client)
             eos_devices.append(tmp_eos_sw)
         return(eos_devices)
-
 
     def update_topology(self,configlets):
         # Get all the devices in CVP
@@ -175,6 +213,7 @@ class ConfigureTopology():
 
     def deploy_lab(self):
 
+        self.create_websocket(self.get_public_ip())
 
         # Check for additional commands in lab yaml file
         lab_file = open('/home/arista/menus/{0}'.format(self.selected_menu + '.yaml'))
