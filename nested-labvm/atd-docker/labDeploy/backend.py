@@ -34,6 +34,7 @@ class BackEnd(tornado.websocket.WebSocketHandler):
         with open('/var/log/chat.log', 'a') as chat_log:
             chat_log.write(message)
             chat_log.close()
+        self.send_to_socket('received message: {0}'.format(data['text']))
         self.send_to_syslog("INFO", 'Received message {0} in socket.'.format(message))
         if data['type'] == 'openMessage':
             pass

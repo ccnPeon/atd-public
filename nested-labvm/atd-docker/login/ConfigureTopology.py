@@ -118,7 +118,7 @@ class ConfigureTopology():
 
     def send_to_socket(self,message):
             self.ws.send(json.dumps({
-                'type': 'serverData',
+                'type': 'clientData',
                 'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 'status': message
             }))  

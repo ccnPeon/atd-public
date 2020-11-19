@@ -30,7 +30,7 @@
             }
     
             ws.onmessage = function (msg) {
-                console.log(msg);
+                console.log(msg['data']);
                 var data = JSON.parse(msg['data'])
                 if (data['type'] == 'serverData') {
                     $('#executionStatus').text(data['status']);
