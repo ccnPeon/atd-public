@@ -80,6 +80,8 @@ def device_menu():
 
     # Sort veos instances
     veos_info_sorted = sort_veos(veos_info)
+    additional_ssh_nodes_sorted = sort_veos(additional_ssh_nodes)
+    
     print("\n\n*****************************************")
     print("*****Jump Host for Arista Test Drive*****")
     print("*****************************************")
@@ -96,9 +98,20 @@ def device_menu():
     counter = 1
     for veos in veos_info_sorted:
         print("{0}. {1} ({2})".format(str(counter),veos['hostname'],veos['hostname']))
-        device_dict[str(counter)] = veos['ip']
-        device_dict[veos['hostname']] = veos['ip']
+        device_dict[str(counter)] = { 'ip_addr': veos['ip_addr'] }
+        device_dict[veos['hostname']] = { 'ip_addr': veos['ip_addr'] }
         counter += 1
+    if additional_ssh_nodes_sorted != None:
+      for additional_ssh_node in additional_ssh_nodes_sorted:
+          print("{0}. {1} ({2})".format(str(counter),additional_ssh_node['hostname'],additional_ssh_node['hostname']))
+          device_dict[str(counter)] = { 'ip_addr': additional_ssh_node['ip_addr'] }
+          device_dict[additional_ssh_node['hostname']] = { 'ip_addr': additional_ssh_node['ip_addr'] }
+          if 'port' in additional_ssh_node:
+              device_dict[str(counter)]['port'] = additional_ssh_node['port']
+              device_dict[additional_ssh_node['hostname']]['port'] = additional_ssh_node['port']
+          counter += 1
+
+
     
     print("\nOther Options: ")
     print("96. Screen (screen) - Opens a screen session to each of the hosts")
@@ -106,13 +119,20 @@ def device_menu():
     print("98. Shell (shell/bash)")
     print("99. Back to Main Menu (main/exit) - CTRL + c")
     print("")
-    user_input = input("What would you like to do? ").replace(' ', '')
+    user_input = input("What would you like to do? ")
 
     # Check to see if input is in device_dict
     counter = 1
     # try:
     if user_input.lower() in device_dict:
-        os.system('ssh ' + device_dict[user_input])
+        ssh_command = 'ssh -o StrictHostKeyChecking=no arista@{0}'.format(device_dict[user_input]['ip_addr'])
+        previous_menu = menu_mode
+        if 'port' in device_dict[user_input]:
+            ssh_command += ' -p {0}'.format(device_dict[user_input]['port'])
+        else:
+          pass
+        # Execute ssh command
+        os.system(ssh_command)
     elif user_input == '96' or user_input.lower() == 'screen':
         os.system('/usr/bin/screen')
     elif user_input == '97' or user_input.lower() == 'back':
