@@ -10,7 +10,7 @@ RUN apt update
 
 RUN apt install -y openssh-server vim sudo screen
 
-RUN pip install ruamel.yaml rcvpapi cvprac pyaml paramiko scp
+RUN pip install ruamel.yaml rcvpapi cvprac pyaml paramiko scp websocket-client
 
 RUN mkdir /var/run/sshd
 
