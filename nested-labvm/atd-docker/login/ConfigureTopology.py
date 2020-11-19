@@ -219,6 +219,8 @@ class ConfigureTopology():
 
     def deploy_lab(self):
 
+        self.send_to_socket('this is a test')
+
         # Check for additional commands in lab yaml file
         lab_file = open('/home/arista/menus/{0}'.format(self.selected_menu + '.yaml'))
         lab_info = YAML().load(lab_file)
@@ -318,3 +320,6 @@ class ConfigureTopology():
                         os.system(command)
 
                 input("Lab Setup Completed. Please press Enter to continue...")
+
+        # Tear down web socket
+        self.close_websocket()
