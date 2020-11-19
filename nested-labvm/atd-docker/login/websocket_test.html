@@ -1,0 +1,57 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="Arista ATD Lab">
+<meta name="author" content="Alex Feigenson (alexf@arista.com)">
+
+<title>Arista ATD</title>
+
+<body>
+
+
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="https://code.jquery.com/jquery-2.2.4.js"></script>
+    <script src="http://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    
+    <script type="text/javascript" charset="utf-8">
+        // Set stage for incoming socket events
+        var url = '';
+        $(document).ready(function() {
+    
+            url = 'ws://bgmenu-2-e426e56b.topo.testdrive-dev.arista.com:80/backend'
+    
+            ws = new WebSocket(url);
+            ws.onopen = function() {
+                var requestData = {};
+                requestData.type = 'openMessage'
+                requestData.text = "opened";
+                ws.send(JSON.stringify(requestData));
+                console.log(ws);
+            }
+    
+            ws.onmessage = function (msg) {
+                console.log(msg);
+                var data = JSON.parse(msg['data'])
+                if (data['type'] == 'serverData') {
+                    $('#executionStatus').text(data['status']);
+    
+                }
+                else if (data['type'] == 'keepalive') {
+                    var requestData = {};
+                    requestData.type = 'keepalive'
+                    requestData.text = "pong";
+                    console.log(requestData)
+                    ws.send(JSON.stringify(requestData));
+    
+                }
+                else {
+                    $('#executionStatus').val('failed');
+                }
+            };
+        }); 
+    
+        
+    </script>
+
+</body>
+

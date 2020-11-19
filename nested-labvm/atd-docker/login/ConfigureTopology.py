@@ -8,6 +8,7 @@ from scp import SCPClient
 import os
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+import websocket
 
 
 DEBUG = False
@@ -35,6 +36,7 @@ class ConfigureTopology():
         self.selected_menu = selected_menu
         self.selected_lab = selected_lab
         self.public_module_flag = public_module_flag
+        self.ws = self.create_websocket()
         self.deploy_lab()
 
     def connect_to_cvp(self,access_info):
@@ -88,9 +90,10 @@ class ConfigureTopology():
     def create_websocket(self,public_ip):
         
         try:
-            url = "ws://{0}:80/backend".format(public_ip)
+            url = "ws://{0}/backend".format(public_ip)
             self.send_to_syslog("INFO", "Connecting to web socket on {0}.".format(url))
-            ws = create_connection(url)
+            ws = websocket.WebSocket()
+            ws.connect(url)
             ws.send(json.dumps({
                 'type': 'openMessage',
                 'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
