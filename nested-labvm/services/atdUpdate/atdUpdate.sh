@@ -22,6 +22,10 @@ rm -rf /opt/atd
 
 git clone --branch $BRANCH $REPO /opt/atd
 
+# Update atdUpdate service
+
+rsync -av /opt/atd/nested-labvm/services/atdUpdate/atdUpdate.sh /usr/local/bin/
+
 # Update ssh-key in EOS configlet for Arista user
 ARISTA_SSH=$(cat /home/arista/.ssh/id_rsa.pub)
 
@@ -29,18 +33,10 @@ sed -i "/username arista ssh-key/cusername arista ssh-key ${ARISTA_SSH}" /opt/at
 
 # Update arista user password for Guacamole
 
-sed -i "s/{ARISTA_REPLACE}/$APWD/g" /opt/atd/topologies/$TOPO/files/infra/user-mapping.xml
+find /opt/atd/nested-labvm/atd-docker/*  -type f -print0 | xargs -0 sed -i "s/{ARISTA_REPLACE}/$APWD/g" 
+find /opt/atd/topologies/$TOPO/files/*  -type f -print0 | xargs -0 sed -i "s/{ARISTA_REPLACE}/$APWD/g" 
 
-# Update atdUpdate service
 
-cp /opt/atd/nested-labvm/services/atdUpdate/atdUpdate.sh /usr/local/bin/
-
-# Removing systemd file copy over for future
-# To be deprecated.
-
-# cp /opt/atd/nested-labvm/services/atdUpdate/atdUpdate.service /etc/systemd/system/
-
-# systemctl daemon-reload
 
 # Update the base configlets for ceos/veos mgmt numbering
 
@@ -48,6 +44,9 @@ if [ $EOS_TYPE == 'ceos' ]
 then
     sed -i 's/Management1/Management0/g' /opt/atd/topologies/$TOPO/configlets/*
 fi
+
+# Copy topo image to app directory
+rsync -av /opt/atd/topologies/$TOPO/atd-topo.png /opt/atd/topologies/$TOPO/files/apps/uilanding
 
 # Add files to arista home
 rsync -av /opt/atd/topologies/$TOPO/files/ /home/arista/arista-dir
@@ -67,9 +66,14 @@ cd /opt/atd/nested-labvm/atd-docker
 
 su atdadmin -c 'bash docker_build.sh'
 
-su atdadmin -c 'docker-compose up -d --remove-orphans'
+# Setting arista user ids for coder container
+export ArID=$(id -u arista)
+export ArGD=$(id -g arista)
+
+/usr/local/bin/docker-compose up -d --remove-orphans
 
 su atdadmin -c 'docker restart atd-login'
+docker restart atd-coder
 
 echo 'y' | docker image prune
 

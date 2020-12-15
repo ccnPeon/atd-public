@@ -82,6 +82,7 @@ services:
     volumes:
       - /etc/atd:/etc/atd:ro
       - /opt/atd:/opt/atd:ro
+      - /home/arista/arista-dir/apps/uilanding:/opt/modules:ro
     networks:
       - atd_nginx
   labguides:
@@ -108,44 +109,29 @@ services:
     restart: always
     depends_on:
       - uilanding
-      - guacamole
       - jenkins
+      - coder
     ports:
       - "80:80/tcp"
+      - "443:443/tcp"
+    volumes:
+      - nginx_log:/var/log/nginx:rw
+      - /etc/atd:/etc/atd:ro
+      - /opt/nginx/certs:/opt/nginx/certs:ro
     networks:
       - atd_nginx
-  desktop:
-    container_name: atd-desktop
-    image: atddocker_desktop:1.0
+  monitor:
+    container_name: atd-monitor
+    image: atddocker_monitor:1.0
     restart: always
-    hostname: devbox
-    privileged: true
+    environment:
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - nginx
     volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-      - /home/arista/GUI_Desktop:/home/arista/Desktop/Files:rw
-      - /home/arista/.ssh:/home/arista/.ssh:rw
-      - /home/arista/arista-dir/hosts:/etc/hosts:ro
-    networks:
-      - guac_net
-  guacd:
-    container_name: atd-guacd
-    image: atddocker_guacd:1.0
-    restart: always
-    networks:
-      - guac_net
-  guacamole:
-    container_name: atd-guacamole
-    image: atddocker_guacamole:1.0
-    restart: always
-    volumes:
-      - /home/arista/infra/user-mapping.xml:/root/.guacamole/user-mapping.xml:ro
-    depends_on: 
-      - guacd
-    networks:
-      - guac_net
-      - atd_nginx
-    environment: 
-      - GUACD_HOSTNAME=atd-guacd
+      - nginx_log:/var/log/nginx:ro
+      - /etc/atd:/etc/atd:ro
+      - /var/log/wtmp:/var/log/wtmp:ro
   jenkins:
     container_name: atd-jenkins
     image: atddocker_jenkins:1.0
@@ -167,17 +153,27 @@ services:
       - /etc/atd/ACCESS_INFO.yaml:/etc/atd/ACCESS_INFO.yaml
       - /home/arista/arista-dir:/home/arista:rw
       - /opt/atd/topologies:/opt/atd/topologies
-  ansible:
-    container_name: atd-ansible-avd
-    image: atddocker_ansiblegui:1.0
+  coder:
+    container_name: atd-coder
+    image: atddocker_coder:1.0
     restart: always
-    privileged: true
+    user: $ArID:$ArGD
+    command: /home/coder/project
+    networks:
+      - atd_nginx
     volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-      - /home/arista/.ssh:/home/arista/.ssh:rw
+      - /home/arista/arista-dir/apps/coder/coder.yaml:/home/coder/.config/code-server/config.yaml:rw
+      - /home/arista/.ssh:/home/coder/.ssh:rw
+      - /home/arista/GUI_Desktop/:/home/coder/project/persist:rw
       - /home/arista/arista-dir/hosts:/etc/hosts:ro
+  ssh:
+    container_name: atd-ssh
+    image: attdocker_ssh:1.0
+    restart: always
     networks:
       - guac_net
+    volumes:
+      - /home/arista/arista-dir/apps/ssh/web.json:/opt/webssh2/app/config.json:ro
   labdeploy:
     container_name: atd-labdeploy
     image: atddocker_labdeploy:1.0
@@ -188,12 +184,21 @@ services:
       - /home/arista/arista-dir/hosts:/etc/hosts:ro
     networks:
       - atd_nginx
-
+  webui:
+    container_name: atd-webui
+    image: jlesage/firefox:latest
+    privileged: true
+    shm_size: 512M
+    restart: always
+    volumes:
+      - "/home/arista/arista-dir/apps/webui:/config:rw"
+    networks:
+      - atd_nginx
 networks:
-  guac_net:
   atd_nginx:
 volumes:
   atd_labguides:
   atd_http:
   jenkins_home:
   cvp_dir:
+  nginx_log:
