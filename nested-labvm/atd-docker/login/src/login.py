@@ -4,17 +4,19 @@ import sys
 import re
 import syslog
 from ruamel.yaml import YAML
-from ConfigureTopology.ConfigureTopology import ConfigureTopology
+import requests
+from datetime import timedelta, datetime, timezone, date
+import syslog
+import time
+import json
+from websocket import create_connection
 
 
 
 ######################################
 ########## Global Variables ##########
 ######################################
-<<<<<<< HEAD:nested-labvm/atd-docker/login/login.py
 DEBUG = False
-=======
->>>>>>> atd-dev-main:nested-labvm/atd-docker/login/src/login.py
 __version__ = "2.1"
 
 # Open ACCESS_INFO.yaml and load the variables
@@ -46,6 +48,43 @@ previous_menu = ''
 #################### Functions ####################
 ###################################################
 
+def send_to_syslog(mstat,mtype):
+    """
+    Function to send output from service file to Syslog
+    Parameters:
+    mstat = Message Status, ie "OK", "INFO" (required)
+    mtype = Message to be sent/displayed (required)
+    """
+    mmes = "\t" + mtype
+    syslog.syslog("[{0}] {1}".format(mstat,mmes.expandtabs(7 - len(mstat))))
+    if DEBUG:
+        print("[{0}] {1}".format(mstat,mmes.expandtabs(7 - len(mstat))))
+
+def get_public_ip():
+    """
+    Function to get Public IP.
+    """
+    response = requests.get('http://ipecho.net/plain')
+    return(response.text)
+
+def send_to_socket(selected_menu,selected_lab):
+    try:
+        url = "ws://{0}/backend".format(get_public_ip())
+        send_to_syslog("INFO", "Connecting to web socket on {0}.".format(url))
+        ws = create_connection(url)
+        ws.send(json.dumps({
+          'type': 'clientData',
+          'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+          'selectedMenu': selected_menu,
+          'selectedLab': selected_lab
+        }))
+        time.sleep(2)
+        send_to_syslog("OK", "Connected to web socket for ConfigureTopology.")
+        ws.close()
+    except Exception as error:
+        print(error)
+        send_to_syslog("ERROR", "ConfigureTopology cannot connect to web socket.")
+
 def text_to_int(text):
   return int(text) if text.isdigit() else text
 
@@ -57,15 +96,10 @@ def sort_veos(vd):
   tmp_d = {}
   fin_l = []
   for t_veos in vd:
-<<<<<<< HEAD:nested-labvm/atd-docker/login/login.py
-    tmp_l.append(t_veos)
-    tmp_d[t_veos] = t_veos
-=======
         t_veos_name = list(t_veos.keys())[0]
         tmp_l.append(t_veos_name)
         tmp_d[t_veos_name] = dict(t_veos[t_veos_name])
         tmp_d[t_veos_name]['hostname'] = t_veos_name
->>>>>>> atd-dev-main:nested-labvm/atd-docker/login/src/login.py
   tmp_l.sort(key=natural_keys)
   # If cvx in list, move to end
   if 'cvx' in tmp_l[0]:
@@ -76,8 +110,6 @@ def sort_veos(vd):
     fin_l.append(tmp_d[t_veos])
   return(fin_l)
 
-<<<<<<< HEAD:nested-labvm/atd-docker/login/login.py
-=======
 def send_to_syslog(mstat,mtype):
     """
     Function to send output from service file to Syslog
@@ -87,8 +119,6 @@ def send_to_syslog(mstat,mtype):
     """
     mmes = "\t" + mtype
     print("[{0}] {1}".format(mstat,mmes.expandtabs(7 - len(mstat))))
-
->>>>>>> atd-dev-main:nested-labvm/atd-docker/login/src/login.py
 
 def device_menu():
     global menu_mode
@@ -115,13 +145,8 @@ def device_menu():
     counter = 1
     for veos in veos_info_sorted:
         print("{0}. {1} ({2})".format(str(counter),veos['hostname'],veos['hostname']))
-<<<<<<< HEAD:nested-labvm/atd-docker/login/login.py
-        device_dict[str(counter)] = veos['ip']
-        device_dict[veos['hostname']] = veos['ip']
-=======
         device_dict[str(counter)] = veos['ip_addr']
         device_dict[veos['hostname']] = veos['ip_addr']
->>>>>>> atd-dev-main:nested-labvm/atd-docker/login/src/login.py
         counter += 1
     
     print("\nOther Options: ")
@@ -134,23 +159,6 @@ def device_menu():
 
     # Check to see if input is in device_dict
     counter = 1
-<<<<<<< HEAD:nested-labvm/atd-docker/login/login.py
-    # try:
-    if user_input.lower() in device_dict:
-        os.system('ssh ' + device_dict[user_input])
-    elif user_input == '96' or user_input.lower() == 'screen':
-        os.system('/usr/bin/screen')
-    elif user_input == '97' or user_input.lower() == 'back':
-        if menu_mode == previous_menu:
-            menu_mode = 'MAIN'
-        else:
-            menu_mode = previous_menu
-    elif user_input == '98' or user_input.lower() == 'bash' or user_input.lower() == 'shell':
-        os.system('/bin/bash')
-    elif user_input == '99' or user_input.lower() == 'main' or user_input == '99' or user_input.lower() == 'exit':
-        menu_mode = 'MAIN'
-    else:
-=======
     try:
       if user_input.lower() in device_dict:
           os.system('ssh ' + device_dict[user_input])
@@ -171,7 +179,6 @@ def device_menu():
         print('Stopped due to keyboard interrupt.')
         send_to_syslog('ERROR', 'Keyboard interrupt.')
     except:
->>>>>>> atd-dev-main:nested-labvm/atd-docker/login/src/login.py
         print("Invalid Input")
 
 
@@ -217,33 +224,28 @@ def lab_options_menu():
       user_input = input("\nWhat would you like to do?: ").replace(' ', '')
 
       # Check to see if digit is in lab_options dict
-      # try:
-      if user_input.lower() in lab_options_dict:
-          previous_menu = menu_mode
-          menu_mode = 'LAB_' + lab_options_dict[user_input]
-      elif user_input == '97' or user_input.lower() == 'back':
-          if menu_mode == previous_menu:
-              menu_mode = 'MAIN'
-          else:
-<<<<<<< HEAD:nested-labvm/atd-docker/login/login.py
-              menu_mode = previous_menu
-      elif user_input == '98' or user_input.lower() == 'ssh':
-          previous_menu = menu_mode
-          menu_mode = 'DEVICE_SSH'
-      elif user_input == '99' or user_input.lower() == 'main' or user_input == '99' or user_input.lower() == 'exit':
-          menu_mode = 'MAIN'
-      else:
-          print("Invalid Input")
-      # except:
-      #     print("Invalid Input")
-=======
-              print("Invalid Input")
-      except KeyboardInterrupt:
-          print('Stopped due to keyboard interrupt.')
-          send_to_syslog('ERROR', 'Keyboard interrupt.')
-      except:
-          print("Invalid Input")
->>>>>>> atd-dev-main:nested-labvm/atd-docker/login/src/login.py
+      try:
+        if user_input.lower() in lab_options_dict:
+            previous_menu = menu_mode
+            menu_mode = 'LAB_' + lab_options_dict[user_input]
+        elif user_input == '97' or user_input.lower() == 'back':
+            if menu_mode == previous_menu:
+                menu_mode = 'MAIN'
+            else:
+                menu_mode = previous_menu
+        elif user_input == '98' or user_input.lower() == 'ssh':
+            previous_menu = menu_mode
+            menu_mode = 'DEVICE_SSH'
+        elif user_input == '99' or user_input.lower() == 'main' or user_input == '99' or user_input.lower() == 'exit':
+            menu_mode = 'MAIN'
+        else:
+            print("Invalid Input")
+                print("Invalid Input")
+        except KeyboardInterrupt:
+            print('Stopped due to keyboard interrupt.')
+            send_to_syslog('ERROR', 'Keyboard interrupt.')
+        except:
+            print("Invalid Input")
 
 
 
@@ -278,26 +280,6 @@ def lab_options_menu():
       user_input = input("What would you like to do?: ").replace(' ', '')
 
       # Check to see if input is in commands_dict
-<<<<<<< HEAD:nested-labvm/atd-docker/login/login.py
-      # try:
-      if user_input.lower() in options_dict:
-          previous_menu = menu_mode
-          ConfigureTopology(selected_menu=options_dict[user_input]['selected_menu'],selected_lab=options_dict[user_input]['selected_lab'])
-      elif user_input == '97' or user_input.lower() == 'back':
-          if menu_mode == previous_menu:
-              menu_mode = 'MAIN'
-          else:
-              menu_mode = previous_menu
-      elif user_input == '98' or user_input.lower() == 'ssh':
-          previous_menu = menu_mode
-          menu_mode = 'DEVICE_SSH'
-      elif user_input == '99' or user_input.lower() == 'main' or user_input == '99' or user_input.lower() == 'exit':
-          menu_mode = 'MAIN'
-      else:
-          print("Invalid Input")
-      # except:
-      #     print("Invalid Input")
-=======
       try:
           if user_input.lower() in options_dict:
               previous_menu = menu_mode
@@ -319,7 +301,6 @@ def lab_options_menu():
           send_to_syslog('ERROR', 'Keyboard interrupt.')
       except:
           print("Invalid Input")
->>>>>>> atd-dev-main:nested-labvm/atd-docker/login/src/login.py
 
 def main_menu():
     global menu_mode
@@ -367,23 +348,6 @@ def main_menu():
     user_input = input("What would you like to do?: ").replace(' ', '')
     
     # Check user input to see which menu to change to
-<<<<<<< HEAD:nested-labvm/atd-docker/login/login.py
-    # try:
-    if user_input.lower() in options_dict:
-        ConfigureTopology(selected_menu=options_dict[user_input]['selected_menu'],selected_lab=options_dict[user_input]['selected_lab'])
-    elif user_input == '98' or user_input.lower() == 'ssh':
-      previous_menu = menu_mode
-      menu_mode = 'DEVICE_SSH'
-    elif user_input == '97' or user_input.lower() == 'labs':
-      previous_menu = menu_mode
-      menu_mode = 'LAB_OPTIONS'
-    elif user_input == '99' or user_input.lower() == 'exit' or user_input.lower() == 'quit':
-      menu_mode = 'EXIT'
-    else:
-      print("Invalid Input")
-    # except:
-    #     print("Invalid Input")
-=======
     try:
       if user_input.lower() in options_dict:
           ConfigureTopology(selected_menu=options_dict[user_input]['selected_menu'],selected_lab=options_dict[user_input]['selected_lab'])
@@ -402,7 +366,7 @@ def main_menu():
         send_to_syslog('ERROR', 'Keyboard interrupt.')
     except:
         print("Invalid Input")
->>>>>>> atd-dev-main:nested-labvm/atd-docker/login/src/login.py
+
 
 
 
@@ -428,10 +392,7 @@ def main():
                       print('User exited.')
                       quit()
                 except KeyboardInterrupt:
-<<<<<<< HEAD:nested-labvm/atd-docker/login/login.py
-=======
                     send_to_syslog('INFO', 'Script fully exited due to keyboard interrupt.')
->>>>>>> atd-dev-main:nested-labvm/atd-docker/login/src/login.py
                     if menu_mode == 'MAIN':
                       print('User exited.')
                       quit()

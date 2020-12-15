@@ -6,11 +6,14 @@ import json
 import tornado.websocket
 from datetime import timedelta, datetime, timezone, date
 from ruamel.yaml import YAML
-from ConfigureTopology import ConfigureTopology
 import syslog
 import tornado.ioloop
 import asyncio
 import sys
+
+# BackendFunctions imports
+sys.path.append('./BackendFunctions')
+from configure_topology import *
 
 DEBUG = False
 
@@ -41,8 +44,12 @@ class BackEnd(tornado.websocket.WebSocketHandler):
         elif data['type'] == 'serverData':
             pass
         elif data['type'] == 'clientData':
-            ConfigureTopology(selected_menu=data['selectedMenu'],selected_lab=data['selectedLab'],bypass_input=True,socket=self)
-
+            try:
+                deploy_lab(selected_menu=data['selectedMenu'],selected_lab=data['selectedLab'],bypass_input=True)
+            except Exception as error:
+                with open('/var/log/error.log', 'a') as error_file:
+                    error_file.write(error+'/n')
+                    error_file.close()
 
     def send_to_syslog(self,mstat,mtype):
         """
